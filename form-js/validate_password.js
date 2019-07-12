@@ -4,7 +4,6 @@ var capital = document.getElementById("capital");
 var number = document.getElementById("number");
 var length = document.getElementById("length");
 var check = document.getElementById("retype_password");
-// var submitButton = document.getElementById("register-button");
 
 
 // When the user clicks on the password field, show the message box
@@ -65,11 +64,12 @@ myInput.onkeyup = function () {
     var pword = document.getElementById("psw").value;
     var cpword = document.getElementById("retype_password").value;
     if ((pword == cpword) && (pword != "") && (cpword != "")) {
-        document.getElementById('invalid-msg').style.color = 'green';
         document.getElementById('invalid-msg').innerHTML = 'Retype Password matches';
+        document.getElementById('invalid-msg').style.color = 'green';
     } else {
-        document.getElementById('invalid-msg').style.color = 'red';
+
         document.getElementById('invalid-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
+        document.getElementById('invalid-msg').style.color = 'red';
     }
 
 }
@@ -84,12 +84,12 @@ check.onkeyup = function () {
     var pword = document.getElementById("psw").value;
     var cpword = document.getElementById("retype_password").value;
     if ((pword == cpword) && (pword != "") && (cpword != "")) {
+        document.getElementById('invalid-msg').innerHTML = 'Retype Password field matches';
         document.getElementById('invalid-msg').style.color = 'green';
-        document.getElementById('invalid-msg').innerHTML = 'matching';
     } else {
-        document.getElementById('invalid-msg').style.color = 'Retype Password field matches';
         // retype_password.classList.add("confirmpsw");
         document.getElementById('invalid-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
+        document.getElementById('invalid-msg').style.color = 'red';
     }
 }
 
@@ -109,3 +109,5 @@ check.onkeyup = function () {
 //
 //     }
 // }
+
+
