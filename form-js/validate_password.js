@@ -1,30 +1,27 @@
-var myInput = document.getElementById("psw");
+var password = document.getElementById("psw");
 var letter = document.getElementById("letter");
 var capital = document.getElementById("capital");
 var number = document.getElementById("number");
 var length = document.getElementById("length");
-var check = document.getElementById("retype_password");
+var retype_psword = document.getElementById("retype_password");
 
 
-// When the user clicks on the password field, show the message box
-myInput.onfocus = function () {
+password.onfocus = function () {
     document.getElementById("message").style.display = "block";
     document.getElementById("psw-check").style.display = "none";
 }
 
-// When the user clicks outside of the password field, hide the message box
-myInput.onblur = function () {
-    document.getElementById("message").style.display = "none";
-    // document.getElementById("pass-retype").style.display = "none";
 
+password.onblur = function () {
+    document.getElementById("message").style.display = "none";
 }
 
-// When the user starts to type something inside the password field
-myInput.onkeyup = function () {
-    // Validate lowercase letters
+
+password.onkeyup = function () {
+
 
     var lowerCaseLetters = /[a-z]/g;
-    if (myInput.value.match(lowerCaseLetters)) {
+    if (password.value.match(lowerCaseLetters)) {
         letter.classList.remove("invalid");
         letter.classList.add("valid");
     } else {
@@ -32,9 +29,8 @@ myInput.onkeyup = function () {
         letter.classList.add("invalid");
     }
 
-    // Validate capital letters
     var upperCaseLetters = /[A-Z]/g;
-    if (myInput.value.match(upperCaseLetters)) {
+    if (password.value.match(upperCaseLetters)) {
         capital.classList.remove("invalid");
         capital.classList.add("valid");
     } else {
@@ -42,9 +38,9 @@ myInput.onkeyup = function () {
         capital.classList.add("invalid");
     }
 
-    // Validate numbers
+
     var numbers = /[0-9]/g;
-    if (myInput.value.match(numbers)) {
+    if (password.value.match(numbers)) {
         number.classList.remove("invalid");
         number.classList.add("valid");
     } else {
@@ -52,8 +48,8 @@ myInput.onkeyup = function () {
         number.classList.add("invalid");
     }
 
-    // Validate length
-    if (myInput.value.length >= 6) {
+
+    if (password.value.length >= 6) {
         length.classList.remove("invalid");
         length.classList.add("valid");
     } else {
@@ -61,53 +57,30 @@ myInput.onkeyup = function () {
         length.classList.add("invalid");
     }
 
-    var pword = document.getElementById("psw").value;
-    var cpword = document.getElementById("retype_password").value;
-    if ((pword == cpword) && (pword != "") && (cpword != "")) {
-        document.getElementById('invalid-msg').innerHTML = 'Retype Password matches';
-        document.getElementById('invalid-msg').style.color = 'green';
+
+    if ((password == retype_psword) && (password != "") && (retype_psword != "")) {
+        document.getElementById('feedback-msg').innerHTML = 'Retype Password matches';
+        document.getElementById('feedback-msg').style.color = 'green';
     } else {
 
-        document.getElementById('invalid-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
-        document.getElementById('invalid-msg').style.color = 'red';
+        document.getElementById('feedback-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
+        document.getElementById('feedback-msg').style.color = 'red';
     }
 
 }
 
-// check if password and confirm password fields match
 
-// check.onfocus = function () {
-//     document.getElementById("pass-retype").style.display = "none";
-// }
+retype_psword.onkeyup = function () {
 
-check.onkeyup = function () {
-    var pword = document.getElementById("psw").value;
-    var cpword = document.getElementById("retype_password").value;
-    if ((pword == cpword) && (pword != "") && (cpword != "")) {
-        document.getElementById('invalid-msg').innerHTML = 'Retype Password field matches';
-        document.getElementById('invalid-msg').style.color = 'green';
+    if ((password == retype_psword) && (password != "") && (retype_psword != "")) {
+        document.getElementById('feedback-msg').innerHTML = 'Retype Password field matches';
+        document.getElementById('feedback-msg').style.color = 'green';
     } else {
-        // retype_password.classList.add("confirmpsw");
-        document.getElementById('invalid-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
-        document.getElementById('invalid-msg').style.color = 'red';
+
+        document.getElementById('feedback-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
+        document.getElementById('feedback-msg').style.color = 'red';
     }
 }
 
-// submitButton.onclick = function () {
-//
-//     var pword = document.getElementById("psw").value;
-//     var cpword = document.getElementById("retype_password").value;
-//     if ((pword == cpword) && (pword != "") && (cpword != "")) {
-//
-//         document.getElementById('invalid-msg').style.color = 'green';
-//         document.getElementById('invalid-msg').innerHTML = 'Retype Password field matches';
-//
-//     } else {
-//
-//         document.getElementById('invalid-msg').style.color = 'red';
-//         document.getElementById('invalid-msg').innerHTML = 'Retype Password field is Invalid. Does not match with Password';
-//
-//     }
-// }
 
 
