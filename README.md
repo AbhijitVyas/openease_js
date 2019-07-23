@@ -9,7 +9,7 @@ Cannot be run by itself as of right now. Either build the [whole project](https:
 
 Apart from that, tests will of course still run in CI-environment.
 
-**IMPORTANT**: If dependencies are added or removed, they also have to removed from `openease_flask/webrob/static/package.json`. This is quite cumbersome, therefore we are working on a workaround.
+**IMPORTANT**: If dependencies are added or removed, they also have to be added to or removed from [`openease_flask/webrob/static/package.json`](https://github.com/navidJadid/openease_flask/blob/master/webrob/static/package.json). This is quite cumbersome, therefore we are working on a workaround.
 
 **TODO:**
 - add CI-test suite & add following lines to script in package.json:  
