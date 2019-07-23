@@ -1,0 +1,16 @@
+language: node_js
+# consider removing node_js versions, if build times out
+node_js:
+  - "stable"
+  - "11"
+  - "10"
+  - "9"
+  - "8"
+  - "7"
+  - "6"
+
+# TODO: consider adding codecov hook like demonstrated here: https://github.com/codecov/codecov-node
+
+branches:
+  only:
+    - master
