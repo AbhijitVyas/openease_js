@@ -10,7 +10,3 @@ node_js:
   - "6"
 
 # TODO: consider adding codecov hook like demonstrated here: https://github.com/codecov/codecov-node
-
-branches:
-  only:
-    - master
