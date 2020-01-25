@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/navidJadid/openease_js"
+    "url": "git+https://github.com/ease-crc/openease_js"
   },
   "bugs": {
-    "url": "https://github.com/navidJadid/openease_js/issues"
+    "url": "https://github.com/ease-crc/openease_js/issues"
   },
-  "homepage": "https://github.com/navidJadid/openease_js#readme",
+  "homepage": "https://github.com/ease-crc/openease_js#readme",
   "jest": {
     "verbose": true,
     "testURL": "http://localhost/",
