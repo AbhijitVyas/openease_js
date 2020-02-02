@@ -263,35 +263,35 @@ function PrologConsole(client, options) {
     ///////////////////////////////
 
     this.addHistoryItem = function (query) {
-        $.ajax({
-            url: "/knowrob/add_history_item",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({query: query}),  
-            dataType: "json"
-        }).done( function (request) {})
+//         $.ajax({
+//             url: "/knowrob/add_history_item",
+//             type: "POST",
+//             contentType: "application/json",
+//             data: JSON.stringify({query: query}),  
+//             dataType: "json"
+//         }).done( function (request) {});
     };
 
     this.setHistoryItem = function (index) {
-        $.ajax({
-            url: "/knowrob/get_history_item",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({index: index}),  
-            dataType: "json",
-            success: function (data) {
-                 ace.edit(queryDiv).setValue(data.item);
-                 historyIndex = data.index;
-            }
-        }).done( function (request) {})
+//         $.ajax({
+//             url: "/knowrob/get_history_item",
+//             type: "POST",
+//             contentType: "application/json",
+//             data: JSON.stringify({index: index}),  
+//             dataType: "json",
+//             success: function (data) {
+//                  ace.edit(queryDiv).setValue(data.item);
+//                  historyIndex = data.index;
+//             }
+//         }).done( function (request) {});
     };
 
     this.nextHistoryItem = function () {
-        this.setHistoryItem(historyIndex+1);
+//         this.setHistoryItem(historyIndex+1);
     };
     
     this.previousHistoryItem = function () {
-        this.setHistoryItem(historyIndex-1);
+//         this.setHistoryItem(historyIndex-1);
     };
     
     this.zoomIn = function() {
