@@ -5,22 +5,48 @@
  * a webgl canvas and some widgets for
  * displaying graphics and statistics.
  **/
-function KnowrobUI(client, options) {
+function KnowrobUI(flask_user,options) {
     var that = this;
     
     this.imageWidth = function(doc) { return 0.0; };
     this.imageHeight = function(doc) { return 0.0; };
     
-    var libraryData;
+    this.client = new KnowrobClient({
+        flask_user:     flask_user,
+        ros_url:        options.ros_url,
+        authentication: options.authentication,
+        auth_url: '/api/v1.0/auth_by_session',
+        meshPath: '/meshes/'
+    });
+    // set-up some event handler
+    this.client.on_register_nodes = this.registerROSClients;
+    this.client.on_camera_pose_received = this.setCameraPose;
+    this.client.on_unselect_marker = function(marker) {
+        that.rosViewer.unhighlight(marker);
+        that.initQueryLibrary(marker);
+    };
+    this.client.on_select_marker = function(marker) {
+        that.rosViewer.highlight(marker);
+        that.loadMarkerQueries(marker);
+    };
+    this.client.on_remove_marker = function(marker) {
+        if(marker === that.client.selectedMarker) {
+            that.initQueryLibrary();
+        }
+    };
     
     this.rosViewer = undefined;
     this.console = undefined;
     this.queryLibrary = undefined;
+    // TODO: are these strill used?
+    this.visClient = undefined;
+    this.graphClient = undefined;
 
     this.init = function () {
+        that.client.init();
         that.initCanvas();
         
-        that.console = new PrologConsole(client, options);
+        that.console = new PrologConsole(that.client, options);
         that.console.init();
         
         that.initQueryLibrary();
@@ -37,12 +63,12 @@ function KnowrobUI(client, options) {
           delete that.rosViewer;
           document.getElementById('markers').innerHTML = "";
         }
-        that.rosViewer = client.newCanvas({
+        that.rosViewer = that.client.newCanvas({
             divID: document.getElementById('markers'),
             on_window_dblclick: function() {
-                if(client.selectedMarker) {
+                if(that.client.selectedMarker) {
                     that.initQueryLibrary();
-                    client.unselectMarker();
+                    that.client.unselectMarker();
                 }
             }
         });
@@ -64,12 +90,46 @@ function KnowrobUI(client, options) {
         that.rosViewer.setCameraPose(pose);
     };
     
+    this.registerROSClients = function () {
+        that.visClient = new DataVisClient({
+            ros: knowrob_client.ros,
+            containerId: '#chart',
+            topic: 'data_vis_msgs'
+        });
+        that.graphClient = new TaskTreeVisClient({
+            ros: knowrob_client.ros,
+            containerId: '#designator',
+            topic: 'task_tree_msgs'
+        });
+        that.highlightClient = new ROSLIB.Topic({
+            ros : that.ros,
+            name : '/openease/highlight',
+            messageType : 'knowrob_openease/Highlight'
+        });
+        that.highlightClient.subscribe(function(msg) {
+          var r = msg.color.r;
+          var g = msg.color.g;
+          var b = msg.color.b;
+          var a = msg.color.a;
+          for(var i in msg.objects) {
+              var o = msg.objects[i];
+              var marker = that.markerArrayClient.getObjectMarker(o.toString());
+              if(!marker) continue;
+              if(r>0 || g>0 || b>0 || a>0) {
+                  that.rosViewer.highlight(marker, [r,g,b,a]);
+              } else {
+                  that.rosViewer.unhighlight(marker);
+              }
+          }
+        });
+    };
+    
     ///////////////////////////////
     //////////// Query Library
     ///////////////////////////////
     
     this.loadQueriesForObject = function(objectName) {
-        var prolog = client.newProlog();
+        var prolog = that.client.newProlog();
         prolog.jsonQuery("object_queries("+objectName+",Queries).",
             function(result) {
                 prolog.finishClient();
@@ -100,6 +160,17 @@ function KnowrobUI(client, options) {
         }
         
         ui.initQueryLibrary(queryLib);
+    };
+    
+    this.loadMarkerQueries = function(marker) {
+        var prolog = that.client.newProlog();
+        prolog.jsonQuery("term_to_atom("+marker.ns+",MarkerName), "+
+            "marker_queries(MarkerName, MarkerQueries).",
+            function(result) {
+                prolog.finishClient();
+                that.loadObjectQueries(result.solution.MarkerQueries);
+            }
+        );
     };
     
     this.initQueryLibrary = function (queries) {
@@ -148,7 +219,8 @@ function KnowrobUI(client, options) {
         
         if(queries == undefined) {
           // TODO: only dowload if required!
-          client.episode.queryEpisodeData(loadQueries);
+            // FIXME
+          //that.client.episode.queryEpisodeData(loadQueries);
         }
         else {
             loadQueries(queries);
@@ -182,120 +254,4 @@ function KnowrobUI(client, options) {
             that.console.query();
         }
     });
-    
-    ///////////////////////////////
-    //////////// Editable Query Library
-    ///////////////////////////////
-    
-    function textEditor(container, options) {
-        $('<textarea class="library_textarea" data-bind="value: ' + options.field + '"></textarea>').appendTo(container);
-    };
-    
-    this.dialogCredentials = function() {
-        return {
-            server: $("#dialog-server-field input").val(),
-            user: $("#dialog-user-field input").val(),
-            pw: $("#dialog-pw-field input").val()
-        };
-    };
-    
-    this.dialogServerSelection = function(note) {
-        $("#dialog").html('<div class="dialog-prompt">Please select the server:</div>'+
-            '<select id="dialog-server-select" class="form-group">'+
-                '<option>openEASE</option>'+
-                '<option>FTP</option>'+
-            '</select>' +
-            '<div id="dialog-server-field" class="form-group ftp-input" style="display: none">' +
-                '<input placeholder="Server" class="form-control" type="text" value="open-ease-stor.informatik.uni-bremen.de" />' +
-            '</div>' +
-            '<div id="dialog-user-field" class="form-group ftp-input" style="display: none">' +
-                '<input placeholder="Username" class="form-control" type="text" value="" />' +
-            '</div>' +
-            '<div id="dialog-pw-field" class="form-group ftp-input" style="display: none">' +
-                '<input placeholder="Password" class="form-control" name="password" type="password" value="" />' +
-            '</div>' +
-            '<div class="dialog-note">'+note+'</div>'
-        );
-        
-        $("#dialog-server-select").change(function() {
-            if($("#dialog-server-select option:selected").text()=='openEASE') {
-                $("#dialog .ftp-input").css('display', 'none');
-            }
-            else {
-                $("#dialog .ftp-input").css('display', 'block');
-            }
-        });
-        
-        return {
-            autoOpen: false,
-            modal: true,
-            resizable: false,
-            width:'auto',
-            buttons : {
-                "Diff" : function() {
-                    if($("#dialog-server-select option:selected").text()=='openEASE') {
-                        that.diffQueries();
-                    }
-                    else {
-                        client.episode.downloadEpisodeDataFTP(that.dialogCredentials(), that.diffQueries);
-                    }
-                 }
-            }
-        };
-    };
-    
-    this.uploadQueries = function() {
-        var d = that.dialogServerSelection('Uploading replaces the remote query library.');
-        d.buttons["Upload"] = function() {
-            if($("#dialog-server-select option:selected").text()=='openEASE') {
-                client.episode.uploadEpisodeData({ query: that.queryLibrary });
-            }
-            else {
-                client.episode.uploadEpisodeDataFTP(that.dialogCredentials(), { query: that.queryLibrary });
-            }
-            $(this).dialog("close");
-        };
-        d.buttons["Cancel"] = function() { $(this).dialog("close"); };
-        $("#dialog").dialog(d);
-        $("#dialog").dialog("open");
-    };
-    
-    this.downloadQueries = function() {
-        var d = that.dialogServerSelection('Downloading replaces the local query library.');
-        d.buttons["Download"] = function() {
-            if($("#dialog-server-select option:selected").text()=='openEASE') {
-                client.episode.downloadEpisodeData(that.initQueryLibrary);
-            }
-            else {
-                client.episode.downloadEpisodeDataFTP(that.dialogCredentials(), that.initQueryLibrary);
-            }
-            $(this).dialog("close");
-        };
-        d.buttons["Cancel"] = function() { $(this).dialog("close"); };
-        $("#dialog").dialog(d);
-        $("#dialog").dialog("open");
-    };
-    
-    ///////////////////////////////
-    //////////// Query Library Diff
-    ///////////////////////////////
-    
-    this.jsondiff = function(left, right) {
-        var delta = jsondiffpatch.diff(left, right);
-        return delta ? jsondiffpatch.formatters.html.format(delta, left) : undefined;
-    };
-    
-    this.diffQueries = function(query_lib) {
-        var right = JSON.parse(JSON.stringify(that.queryLibrary));
-        if(query_lib == undefined) {
-            client.episode.queryEpisodeData(function(result) {
-                //that.showDiff(that.jsondiff( result.query, right ) );
-                that.showDiff(that.jsondiff( JSON.parse(JSON.stringify(result.query)), right ), 'openEASE');
-            });
-        }
-        else {
-            //that.showDiff(that.jsondiff( result.query, right ) );
-            that.showDiff(that.jsondiff( JSON.parse(JSON.stringify(query_lib.query)), right ), 'FTP' );
-        }
-    };
 };
