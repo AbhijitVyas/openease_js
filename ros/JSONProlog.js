@@ -22,7 +22,7 @@ function JsonProlog(ros, options){
       // connect to ROS service
       var client = new ROSLIB.Service({
         ros : ros,
-        name : '/roprolog/query',
+        name : '/rosprolog/query',
         serviceType : 'json_prolog/PrologQuery'
       });
       // send query
@@ -49,7 +49,7 @@ function JsonProlog(ros, options){
     // connect to ROS service
     var client = new ROSLIB.Service({
       ros : ros,
-      name : '/roprolog/next_solution',
+      name : '/rosprolog/next_solution',
       serviceType : 'json_prolog/PrologNextSolution'
     });
     // send query
@@ -106,7 +106,7 @@ function JsonProlog(ros, options){
   this.finishClient = function () {
     var client = new ROSLIB.Service({
       ros : ros,
-      name : '/roprolog/finish',
+      name : '/rosprolog/finish',
       serviceType : 'json_prolog/PrologFinish'
     });
     request = new ROSLIB.ServiceRequest({
